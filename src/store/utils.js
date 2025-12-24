@@ -10,42 +10,123 @@
  * @param {Object} [options.body] - Request body, for POST, PUT, etc.
  * @returns {Promise<any>} - Parsed JSON data or error.
  */
-export const apiCall = async (url, options = {}) => {
-    try {
-        const defaultHeaders = {
-            'Content-Type': 'application/json'
-        };
+// export const apiCall = async (url, options = {}) => {
+//     try {
+//         const defaultHeaders = {
+//             'Content-Type': 'application/json'
+//         };
 
-        // Handle query parameters
-        if (options.params) {
-            const queryParams = new URLSearchParams(options.params).toString();
-            url = `${url}${url.includes('?') ? '&' : '?'}${queryParams}`;
-            delete options.params; // Remove params from options after using them
-        }
+//         // Handle query parameters
+//         if (options.params) {
+//             const queryParams = new URLSearchParams(options.params).toString();
+//             url = `${url}${url.includes('?') ? '&' : '?'}${queryParams}`;
+//             delete options.params; // Remove params from options after using them
+//         }
 
-        const config = {
-            ...options,
-            headers: {
-                ...defaultHeaders,
-                ...options.headers
-            }
-        };
+//         const config = {
+//             ...options,
+//             headers: {
+//                 ...defaultHeaders,
+//                 ...options.headers
+//             }
+//         };
 
-        // If there's a body, stringify it
-        if (config.body) {
-            config.body = JSON.stringify(config.body);
-        }
+//         // If there's a body, stringify it
+//         if (config.body) {
+//             config.body = JSON.stringify(config.body);
+//         }
 
-        const response = await fetch(url, config);
+//         const response = await fetch(url, config);
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'API call failed');
-        }
+//         if (!response.ok) {
+//             const errorData = await response.json();
+//             throw new Error(errorData.error || 'API call failed');
+//         }
 
-        return await response.json();
-    } catch (error) {
-        console.error('API call failed:', error);
-        throw error;
+//         return await response.json();
+//     } catch (error) {
+//         console.error('API call failed:', error);
+//         throw error;
+//     }
+// };
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+console.log("hello",BASE_URL);
+// export const apiCall = async (endpoint, options = {}) => {
+//     try {
+//         const defaultHeaders = {
+//             'Content-Type': 'application/json'
+//         };
+
+//         let url = `${BASE_URL}${endpoint}`;
+
+//         // Handle query parameters
+//         if (options.params) {
+//             const queryParams = new URLSearchParams(options.params).toString();
+//             url = `${url}?${queryParams}`;
+//             delete options.params;
+//         }
+
+//         const config = {
+//             ...options,
+//             headers: {
+//                 ...defaultHeaders,
+//                 ...options.headers
+//             }
+//         };
+
+//         if (config.body) {
+//             config.body = JSON.stringify(config.body);
+//         }
+
+//         const response = await fetch(url, config);
+
+//         if (!response.ok) {
+//             const errorData = await response.json();
+//             throw new Error(errorData.error || 'API call failed');
+//         }
+
+//         return await response.json();
+//     } catch (error) {
+//         console.error('API call failed:', error);
+//         throw error;
+//     }
+// };
+export const apiCall = async (endpoint, options = {}) => {
+  try {
+    const defaultHeaders = {
+      'Content-Type': 'application/json'
+    };
+
+    let url = endpoint; 
+
+    if (options.params) {
+      const queryParams = new URLSearchParams(options.params).toString();
+      url = `${url}?${queryParams}`;
+      delete options.params;
     }
+
+    const config = {
+      ...options,
+      headers: {
+        ...defaultHeaders,
+        ...options.headers
+      }
+    };
+
+    if (config.body) {
+      config.body = JSON.stringify(config.body);
+    }
+
+    const response = await fetch(url, config);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'API call failed');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API call failed:', error);
+    throw error;
+  }
 };

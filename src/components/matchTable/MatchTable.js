@@ -14,8 +14,10 @@ const MatchTable = ({ tournamentId }) => {
       try {
         setLoading(true);
         const response = await apiCall(endpoints.getFixtures, {
-          params: { tournament_id: tournamentId }
+          params: { tournament_id: Number(tournamentId) }
         });
+
+        console.log("Tournament ID passed to MatchTable:", tournamentId);
 
         if (response && response.matches) {
           setMatches(response.matches);

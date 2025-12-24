@@ -4,7 +4,7 @@ const getBaseUrl = () => {
     // Check if localhost
     if (hostname === 'localhost') {
         console.log('Using localhost API endpoint');
-        return "http://localhost:5001";
+        return "http://localhost:5000";
     }
     
     // Check if dev or uat domain
