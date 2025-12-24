@@ -3,6 +3,7 @@ import { apiCall } from '@/store/utils';
 import { endpoints } from '@/store/urls';
 import stl from './MatchTable.module.scss';
 import toast from 'react-hot-toast';
+import { isWalkover } from '@/utils/matchOutcome';
 
 const MatchTable = ({ tournamentId }) => {
   const [matches, setMatches] = useState([]);
@@ -34,7 +35,6 @@ const MatchTable = ({ tournamentId }) => {
 
   const exportToCSV = () => {
     try {
-      // Define CSV headers
       const headers = [
         'Match ID',
         'Round',
@@ -45,24 +45,23 @@ const MatchTable = ({ tournamentId }) => {
         'Status'
       ];
 
-      // Convert matches to CSV rows
       const csvRows = matches.map(match => [
         match.match_id,
         match.round_name || `Round ${match.round_id}`,
         match.pool || '-',
         match.team1_players,
         match.team2_players,
-        match.match_result,
+        isWalkover(match)
+          ? `Walkover - Winner: ${match.match_result}`
+          : match.match_result,
         match.match_status.status
       ]);
 
-      // Combine headers and rows
       const csvContent = [
         headers.join(','),
         ...csvRows.map(row => row.map(cell => `"${cell}"`).join(','))
       ].join('\n');
 
-      // Create blob and download
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
@@ -89,6 +88,7 @@ const MatchTable = ({ tournamentId }) => {
           Export to CSV
         </button>
       </div>
+
       <div className={stl.tableWrapper}>
         <table className={stl.table}>
           <thead>
@@ -102,27 +102,47 @@ const MatchTable = ({ tournamentId }) => {
               <th>Status</th>
             </tr>
           </thead>
+
           <tbody>
-            {matches.map((match) => (
+            {matches.map(match => (
               <tr key={match.match_id}>
                 <td>{match.match_id}</td>
                 <td>{match.round_name || `Round ${match.round_id}`}</td>
                 <td>{match.pool || '-'}</td>
                 <td>{match.team1_players}</td>
                 <td>{match.team2_players}</td>
-                <td>{match.match_result}</td>
+
+                {/* RESULT COLUMN */}
+                <td>
+                  {isWalkover(match) ? (
+                    <span className={stl.walkoverResult}>
+                      Walkover — Winner: {match.match_result}
+                    </span>
+                  ) : (
+                    match.match_result
+                  )}
+                </td>
+
+                {/* STATUS COLUMN */}
                 <td>
                   <span className={`${stl.status} ${stl[match.match_status.status]}`}>
                     {match.match_status.status}
                   </span>
+
+                  {isWalkover(match) && (
+                    <span className={stl.walkoverBadge}>
+                      Walkover
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
     </div>
   );
 };
 
-export default MatchTable; 
+export default MatchTable;

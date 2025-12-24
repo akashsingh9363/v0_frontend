@@ -65,6 +65,20 @@
   }
 }
 
+.walkoverBadge {
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 4px;
+  background-color: #fde68a;
+  color: #92400e;
+}
+
+.walkoverResult {
+  font-weight: 600;
+  color: #92400e;
+}
+
 .status {
   display: inline-block;
   padding: 0.25rem 0.75rem;
